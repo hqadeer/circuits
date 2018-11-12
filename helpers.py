@@ -1,3 +1,5 @@
+from elements import *
+
 def is_component(obj):
     return isinstance(obj, Wire) or isinstance(obj, DualSided)
 
@@ -34,3 +36,19 @@ def ground(elements):
             element.potential = 0
             return element
     raise CircuitError('Circuit must contain at least one node (wire)')
+
+
+def is_wire(element):
+    return isinstance(element, Wire)
+
+
+def is_vs(element):
+    return isinstance(element, VoltageSource)
+
+
+def is_cs(element):
+    return isinstance(element, CurrentSource)
+
+
+def is_resistor(element):
+    return isinstance(element, CurrentSource)
