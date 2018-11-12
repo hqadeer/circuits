@@ -51,4 +51,4 @@ def is_cs(element):
 
 
 def is_resistor(element):
-    return isinstance(element, CurrentSource)
+    return isinstance(element, Resistor)

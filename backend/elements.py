@@ -57,19 +57,3 @@ class Resistor(DualSided):
 
     def __init__(self, resistance):
         self.resistance = resistance
-
-if __name__ == '__main__':
-    """Testing"""
-
-    v = VoltageSource(10)
-    r = Resistor(10)
-    w1 = Wire()
-    w2 = Wire()
-    v.connect_pos(w1)
-    r.connect_pos(w1)
-    v.connect_neg(w2)
-    r.connect_neg(w2)
-    e = [v, r, w1, w2]
-    c = Circuit(e)
-    c.solve()
-    print('done')

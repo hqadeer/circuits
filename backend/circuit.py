@@ -1,5 +1,6 @@
 import numpy as np
 
+from backend.elements import *
 from backend.helpers import *
 
 
@@ -41,15 +42,15 @@ class Circuit:
                 for two_sided in element.attached:
                     if is_cs(two_sided):
                         if two_sided.pos is element:
-                            b[row] += -1 * element.current
+                            b[row] += -1 * two_sided.current
                         else:
-                            b[row] += element.current
+                            b[row] += two_sided.current
                     else:
                         if two_sided.pos is element:
                             flow = 1
                         else:
                             flow = -1
-                    A[row, r_lookup[two_sided]] = flow
+                        A[row, r_lookup[two_sided]] = flow
             elif is_vs(element):
                 check_connected(element)
                 if element.pos is not self.ground:
@@ -109,4 +110,14 @@ class Circuit:
 
 # To do - superposition, dependent sources, capacitors, op-amps, nort/thev
 
+if __name__ == '__main__':
+    """Testing"""
 
+    w1, w2 = Wire(), Wire()
+    c, r = CurrentSource(0.5), Resistor(1000)
+    c.connect_pos(w1)
+    w1.connect(r, 'pos')
+    r.connect_neg(w2)
+    w2.connect(c, 'neg')
+    c = Circuit([w1, w2, c, r])
+    c.solve()
