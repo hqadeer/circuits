@@ -1,4 +1,4 @@
-from elements import *
+from backend.elements import *
 
 def is_component(obj):
     return isinstance(obj, Wire) or isinstance(obj, DualSided)

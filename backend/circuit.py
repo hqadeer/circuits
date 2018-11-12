@@ -1,7 +1,6 @@
 import numpy as np
 
-from elements import *
-from helpers import *
+from backend.helpers import *
 
 
 class Circuit:
