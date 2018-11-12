@@ -66,7 +66,10 @@ class Circuit:
                 A[row, r_lookup[element]] = -1 * element.resistance
 
         b = b.reshape((num, 1))
-        x = np.linalg.solve(A, b)
+        try:
+            x = np.linalg.solve(A, b)
+        except np.linalg.LinAlgError:
+            raise CircuitError('Insufficient information to solve circuit')
 
         # Assign values to all circuit components
         for i in range(num):
@@ -104,6 +107,6 @@ class Circuit:
         self.move_ground(min(self.elements, compare))
 
 
-
+# To do - superposition, dependent sources, capacitors, op-amps, nort/thev
 
 
