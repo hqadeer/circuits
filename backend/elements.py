@@ -3,7 +3,7 @@ class CircuitError(Exception):
 
 
 class Wire:
-
+    """Class representing a wire; can connect to dual-sided components."""
     potential = 0
 
     def __init__(self):
@@ -36,7 +36,6 @@ class DualSided:
 
 
 class VoltageSource(DualSided):
-
     current = 0
 
     def __init__(self, voltage):
@@ -44,14 +43,12 @@ class VoltageSource(DualSided):
 
 
 class CurrentSource(DualSided):
-
     def __init__(self, current):
         self.current = current
 
 
 class Resistor(DualSided):
-
-    current, voltage = 0, 0
+    current = 0
 
     def __init__(self, resistance):
         self.resistance = resistance
