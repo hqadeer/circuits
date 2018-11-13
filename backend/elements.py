@@ -45,8 +45,6 @@ class VoltageSource(DualSided):
 
 class CurrentSource(DualSided):
 
-    voltage = 0
-
     def __init__(self, current):
         self.current = current
 

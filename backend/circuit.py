@@ -1,6 +1,5 @@
 import numpy as np
 
-from backend.elements import *
 from backend.helpers import *
 
 
@@ -9,18 +8,14 @@ class Circuit:
     elements must be contained with the elements iterable passed to
     constructor"""
 
-    ground = None
-
     def __init__(self, elements):
         check_elements(elements)
         self.elements = tuple(elements)
+        self.ground = ground(self.elements)
         self.been_solved = False
 
     def solve(self):
         """Solves for all wire potentials and element currents"""
-
-        # Set first wire in elements as ground (can be changed later)
-        self.ground = ground(self.elements)
 
         # Assign variables to each quantity being solved.
         r_lookup, lookup, num = {}, {}, 0
@@ -85,17 +80,16 @@ class Circuit:
 
     def move_ground(self, wire):
         """Mark another node as ground and shift all other potentials"""
-
         if not self.been_solved:
             self.solve()
         if not is_wire(wire):
             raise CircuitError('Ground node must be a wire!')
-        diff = wire.potential - self.ground.potential
-        wire.potential, self.ground = 0, wire
+        diff, wire.potential = 0 - wire.potential, 0
+        self.ground = wire
 
         for element in self.elements:
             if is_wire(element) and element is not self.ground:
-                wire.potential += diff
+                element.potential += diff
 
     def ground_min(self):
         """Set circuit's ground to node with lowest potential."""
@@ -105,19 +99,52 @@ class Circuit:
                 return e.potential
             else:
                 return float('inf')
-        self.move_ground(min(self.elements, compare))
+        self.move_ground(min(self.elements, key=compare))
+
+    def align_resistors(self):
+        """Swap resistor terminals to make all associated currents positive."""
+
+        if not self.been_solved:
+            self.solve()
+        for element in self.elements:
+            if is_resistor(element) and element.current < 0:
+                element.pos, element.neg = element.neg, element.pos
+                element.current = -1 * element.current
 
 
-# To do - superposition, dependent sources, capacitors, op-amps, nort/thev
+# To do - solving: dependent sources, capacitors, op-amps
+#         steps: capacitor/resistor equivalences, super-position
+#         other: norton/thevenin, symbolic
+#         web app
 
 if __name__ == '__main__':
     """Testing"""
-
-    w1, w2 = Wire(), Wire()
-    c, r = CurrentSource(0.5), Resistor(1000)
-    c.connect_pos(w1)
-    w1.connect(r, 'pos')
-    r.connect_neg(w2)
-    w2.connect(c, 'neg')
-    c = Circuit([w1, w2, c, r])
+    ground_wire = Wire()
+    v1, v2, v3 = VoltageSource(8), VoltageSource(8), VoltageSource(8)
+    r1, r2, r3, r4, r5, r6 = Resistor(200), Resistor(200), Resistor(200), \
+                             Resistor(200), Resistor(100), Resistor(100)
+    ground_wire.connect(v1, 'neg')
+    ground_wire.connect(v2, 'neg')
+    ground_wire.connect(v3, 'neg')
+    ground_wire.connect(r1, 'neg')
+    v1_r, v2_r, v3_r = Wire(), Wire(), Wire()
+    v1_r.connect(v1, 'pos')
+    v1_r.connect(r2, 'neg')
+    v2_r.connect(v2, 'pos')
+    v2_r.connect(r3, 'neg')
+    v3_r.connect(v3, 'pos')
+    v3_r.connect(r4, 'neg')
+    top_l, top_mid, top_r = Wire(), Wire(), Wire()
+    top_l.connect(r1, 'pos')
+    top_l.connect(r2, 'pos')
+    top_l.connect(r5, 'pos')
+    top_mid.connect(r5, 'neg')
+    top_mid.connect(r3, 'pos')
+    top_mid.connect(r6, 'pos')
+    top_r.connect(r6, 'neg')
+    top_r.connect(r4, 'pos')
+    e = [r1, r2, r3, r4, r5, r6, v1, v2, v3, ground_wire, v1_r, v2_r, v3_r,
+         top_l, top_mid, top_r]
+    c = Circuit(e)
     c.solve()
+    c.ground_min()
