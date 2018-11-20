@@ -1,4 +1,4 @@
-from backend.elements import *
+from solver.elements import *
 
 
 def is_component(obj):

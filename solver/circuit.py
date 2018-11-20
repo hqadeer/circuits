@@ -1,6 +1,6 @@
 import numpy as np
 
-from backend.helpers import *
+from solver.helpers import *
 
 
 class Circuit:
